@@ -44,30 +44,32 @@ string[] statuses = { "pending", "in progress", "completed", "overdue" };
 app.MapGet("/tasks", () => Results.Ok(tasks));
 
 // Create a new task
-app.MapPost("/tasks", () => {
-int newId = tasks.Any() ? tasks.Max(t => t.Id) + 1 : 1;
-var newTask = new TaskItem
+app.MapPost("/tasks", () =>
 {
-Id = newId,
-Name = $"task{newId}",
-Status = statuses[random.Next(statuses.Length)],
-CreatedDate = DateTime.UtcNow,
-UpdatedDate = null
-};
-tasks.Add(newTask);
-return Results.Ok(newTask);
+    int newId = tasks.Any() ? tasks.Max(t => t.Id) + 1 : 1;
+    var newTask = new TaskItem
+    {
+        Id = newId,
+        Name = $"task{newId}",
+        Status = statuses[random.Next(statuses.Length)],
+        CreatedDate = DateTime.UtcNow,
+        UpdatedDate = null
+    };
+    tasks.Add(newTask);
+    return Results.Ok(newTask);
 });
 
 // Update task status
-app.MapPut("/tasks/{id}", (int id, string status) => {
-var task = tasks.FirstOrDefault(t => t.Id == id);
-if (task == null) return Results.NotFound();
+app.MapPut("/tasks/{id}", (int id, string status) =>
+{
+    var task = tasks.FirstOrDefault(t => t.Id == id);
+    if (task == null) return Results.NotFound();
 
-if (!statuses.Contains(status)) return Results.BadRequest("Invalid status");
+    if (!statuses.Contains(status)) return Results.BadRequest("Invalid status");
 
-task.Status = status;
-task.UpdatedDate = DateTime.UtcNow;
-return Results.Ok(task);
+    task.Status = status;
+    task.UpdatedDate = DateTime.UtcNow;
+    return Results.Ok(task);
 });
 
 app.Run();
